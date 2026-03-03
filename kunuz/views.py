@@ -1,16 +1,20 @@
 from rest_framework import permissions, generics
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 
 from kunuz import serializers
 from kunuz.models import Category, Post
+from kunuz.throttling import RandomRateThrottle, BurstRateThrottle
 
 
 class CategoryListAPIView(generics.ListAPIView):
+    # throttle_classes = [RandomRateThrottle]
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
 
 
 class PostListAPIView(generics.ListAPIView):
+    throttle_classes = [BurstRateThrottle]
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
 
@@ -28,6 +32,7 @@ class PostDetailAPIView(generics.RetrieveAPIView):
 
 
 class PostCreateAPIView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
 
@@ -36,12 +41,14 @@ class PostCreateAPIView(generics.CreateAPIView):
 
 
 class PostUpdateAPIView(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
     lookup_url_kwarg = 'post_id'
 
 
 class PostDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAdminUser]
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
     lookup_url_kwarg = 'post_id'
