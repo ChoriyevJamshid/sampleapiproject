@@ -5,6 +5,7 @@ from rest_framework.throttling import UserRateThrottle
 from kunuz import serializers
 from kunuz.models import Category, Post
 from kunuz.throttling import RandomRateThrottle, BurstRateThrottle
+from kunuz.permissions import IsOwnerPermission
 
 
 class CategoryListAPIView(generics.ListAPIView):
@@ -41,14 +42,14 @@ class PostCreateAPIView(generics.CreateAPIView):
 
 
 class PostUpdateAPIView(generics.UpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsOwnerPermission]
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
     lookup_url_kwarg = 'post_id'
 
 
 class PostDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAdminUser, IsOwnerPermission]
     queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
     lookup_url_kwarg = 'post_id'
